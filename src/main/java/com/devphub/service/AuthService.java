@@ -1,6 +1,7 @@
 package com.devphub.service;
 
 import com.devphub.dto.RegisterRequest;
+import com.devphub.model.NotificationEmail;
 import com.devphub.model.User;
 import com.devphub.model.VerificationToken;
 import com.devphub.repository.UserRepository;
@@ -21,7 +22,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
-
+    private final MailService mailService;
     public void signup(RegisterRequest registerRequest){
         User user = new User();
         user.setUsername(registerRequest.getUsername());
@@ -33,6 +34,10 @@ public class AuthService {
         userRepository.save(user);
 
         String token = generateVerifcationToken(user);
+        mailService.sendEmail(new NotificationEmail("Pleace Activate your account",
+                user.getEmail(),"Thank you for signing up to DevpHub, " +
+                "pleace click on the below url to activate your account: "+
+                "http://localhost:8080/api/auth/accountVerfication/"+token));
     }
 
     private String generateVerifcationToken(User user){
