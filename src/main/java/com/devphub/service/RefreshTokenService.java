@@ -1,6 +1,7 @@
 package com.devphub.service;
 
-import com.devphub.exceptions.SpringDevpHubException;
+
+import com.devphub.exceptions.SpringRedditException;
 import com.devphub.model.RefreshToken;
 import com.devphub.repository.RefreshTokenRepository;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class RefreshTokenService {
 
     void validateRefreshToken(String token) {
         refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new SpringDevpHubException("Invalid refresh Token"));
+                .orElseThrow(() -> new SpringRedditException("Invalid refresh Token"));
     }
 
     public void deleteRefreshToken(String token) {

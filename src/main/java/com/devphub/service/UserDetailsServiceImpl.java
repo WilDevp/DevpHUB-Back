@@ -1,5 +1,6 @@
 package com.devphub.service;
 
+
 import com.devphub.model.User;
 import com.devphub.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import static java.util.Collections.singletonList;
 
 @Service
 @AllArgsConstructor
-public class UserDatailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
