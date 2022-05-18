@@ -1,6 +1,7 @@
 package com.devphub.service;
 
 import com.devphub.dto.RegisterRequest;
+import com.devphub.exceptions.SpringDevpHubException;
 import com.devphub.model.NotificationEmail;
 import com.devphub.model.User;
 import com.devphub.model.VerificationToken;
@@ -10,12 +11,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class AuthService {
 
     @Autowired
@@ -37,7 +41,7 @@ public class AuthService {
         mailService.sendEmail(new NotificationEmail("Pleace Activate your account",
                 user.getEmail(),"Thank you for signing up to DevpHub, " +
                 "pleace click on the below url to activate your account: "+
-                "http://localhost:8080/api/auth/accountVerfication/"+token));
+                "http://localhost:8080/api/auth/accountVerification/"+token));
     }
 
     private String generateVerifcationToken(User user){
@@ -48,5 +52,18 @@ public class AuthService {
 
         verificationTokenRepository.save(verificationToken);
         return token;
+    }
+
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken =  verificationTokenRepository.findByToken(token);
+        fetchUserAndEnable(verificationToken.orElseThrow(() -> new SpringDevpHubException("Invalid Token")));
+    }
+
+
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringDevpHubException("User not found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 }
